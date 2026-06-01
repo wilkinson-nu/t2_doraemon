@@ -84,7 +84,7 @@ ENV PYTHONPATH=${ROOTSYS}/lib:${PYTHONPATH}
 ## NEUT
 ENV NEUT_ROOT=${GEN_DIR}/neut
 ENV NEUT=${GEN_DIR}/neut/build/Linux
-COPY --from=builder ${NEUT} ${NEUT}
+COPY --from=builder ${NEUT_ROOT} ${NEUT_ROOT}
 ENV NEUT_CARDS=${NEUT}/share/neut/Cards
 ENV NEUT_CRSPATH=${NEUT}/share/neut/crsdat
 ENV PATH=${NEUT}/bin:${PATH}
