@@ -15,7 +15,6 @@ SCALAR_BRANCHES = {
     "q0":           ("q0",      np.float32),
     "q3":           ("q3",      np.float32),
     "cc":           ("cc",      np.bool_  ),
-    "fScaleFactor": ("wgt",     np.float32),
     "nfsp":         ("nfsp",    np.int32  ),
 }
 
