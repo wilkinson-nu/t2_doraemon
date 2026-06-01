@@ -34,6 +34,7 @@ ENV PKG_CONFIG_PATH=${NEUT}:${PKG_CONFIG_PATH}
 WORKDIR ${GEN_DIR}
 RUN git clone https://github.com/NUISANCEMC/nuisance.git NUISANCE && \
     cd NUISANCE && git checkout c596652 && \
+    sed -i 's/LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUT_ENABLED=1)/LIST(APPEND NUISANCENEUT_COMPILE_OPTIONS -DNEUT_ENABLED=1 -DNEUT_VERSION=580)/g' cmake/Modules/NUISANCEDependencies.cmake && \
     mkdir build && cd build && \
     cmake -DCMAKE_CXX_STANDARD=17 \
           -DNEUT_ENABLED=1 \
