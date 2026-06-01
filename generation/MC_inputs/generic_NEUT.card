@@ -13,9 +13,71 @@ NEUT-NUMBNDN _NEUTRONS_
 NEUT-NUMBNDP _PROTONS_
 NEUT-NUMFREP _HYDROGEN_
 NEUT-NUMATOM _NUCLEONS_
-NEUT-MODE   0
 NEUT-MDLQE 2002
 NEUT-MAQE 1.05
 
 ## Look for a seed at RANFILE
 NEUT-RAND 0
+
+## And now for a real pro-gamer move...
+NEUT-MODE -1
+
+## From the NEUT source:
+## NEUT-CRS
+## NEUT-CRSB
+##         CRS is for cross-section weight of neutrino interactions
+##         CRSB is for cross-section weight of anti-neutrino interactions
+##
+##         1:     CC Q.E.             CC Q.E.( Free )
+##         2-4:   CC 1pi              CC 1pi
+##         5:     CC DIS 1320         CC DIS 1.3 < W < 2.0
+##         6-9:   NC 1pi              NC 1pi
+##         10:    NC DIS 1320         NC DIS 1.3 < W < 2.0
+##         11:    NC els ( Free )     CC Q.E.( Bound )
+##         12:    NC els ( Bound p )  NC els ( Free )
+##         13:    NC els ( Bound n )  NC els ( Bound p )
+##         14:    CC coherent         NC els ( Bound n )
+##         15:    NC coherent         CC coherent
+##         16:    CC eta              NC coherent
+##         17     NC eta              CC eta
+##         18:    NC eta              NC eta
+##         19:    CC K                NC eta
+##         20     NC K                CC K
+##         21:    NC K                NC K
+##         22:    N/A                 NC K
+##         23:    CC DIS              CC DIS (W > 2.0)
+##         24:    NC DIS              NC DIS (W > 2.0)
+##         25:    CC 1 gamma          CC 1 gamma
+##         26,27: NC 1 gamma          NC 1 gamma
+##         28:    2p2h                2p2h
+##         29:    CC Diffract. pi     CC Diffract. pi
+##         30:    NC Diffract. pi     NC Diffract. pi
+
+## Make CC-only, allow for neutrino and antineutrino
+## Also note, NEUT-CRS can only read 27 elements (separated by spaces), so I prefer to turn on flags one at a time
+NEUT-CRS 1=1.
+NEUT-CRS 2=1.
+NEUT-CRS 3=1.
+NEUT-CRS 4=1.
+NEUT-CRS 5=1.
+NEUT-CRS 14=1.
+NEUT-CRS 16=1.
+NEUT-CRS 19=1.
+NEUT-CRS 23=1.
+NEUT-CRS 25=1.
+NEUT-CRS 28=1.
+NEUT-CRS 29=1.
+
+NEUT-CRSB 1=1.
+NEUT-CRSB 2=1.
+NEUT-CRSB 3=1.
+NEUT-CRSB 4=1.
+NEUT-CRSB 5=1.
+NEUT-CRSB 11=1.
+NEUT-CRSB 15=1.
+NEUT-CRSB 17=1.
+NEUT-CRSB 20=1.
+NEUT-CRSB 23=1.
+NEUT-CRSB 25=1.
+NEUT-CRSB 28=1.
+NEUT-CRSB 29=1.
