@@ -91,10 +91,11 @@ ENV PATH=${NEUT}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${NEUT}/lib:${LD_LIBRARY_PATH}
 
 ## NUISANCE
-ENV NUISANCE=${GEN_DIR}/NUISANCE/build
-COPY --from=builder ${NUISANCE} ${NUISANCE}
-ENV PATH=${NUISANCE}/Linux/bin:${PATH}
-ENV LD_LIBRARY_PATH=${NUISANCE}/Linux/lib:${LD_LIBRARY_PATH}
+ENV NUISANCE=${GEN_DIR}/NUISANCE
+COPY --from=builder ${NUISANCE}/build ${NUISANCE}/build
+COPY --from=builder ${NUISANCE}/parameters ${NUISANCE}/parameters
+ENV PATH=${NUISANCE}/build/Linux/bin:${PATH}
+ENV LD_LIBRARY_PATH=${NUISANCE}/build/Linux/lib:${LD_LIBRARY_PATH}
 
 ## Python installs
-RUN pip install --no-cache-dir numpy h5py matplotlib
+RUN pip install --no-cache-dir numpy h5py matplotlib uproot awkward
