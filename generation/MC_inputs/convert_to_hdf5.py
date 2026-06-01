@@ -55,11 +55,6 @@ def convert_flattrees_to_hdf5(root_files,
             nfsp        = scalar_data["nfsp"]
             n_particles = int(nfsp.sum())
 
-            ## Unpick the per file normalization in the NUISANCE default
-            scalar_data["fScaleFactor"] = (
-                scalar_data["fScaleFactor"] * 1e38 * n_events
-            )
-
             for root_name in SCALAR_BRANCHES:
                 all_scalar_data[root_name].append(scalar_data[root_name])
             for root_name in VLEN_BRANCHES:
