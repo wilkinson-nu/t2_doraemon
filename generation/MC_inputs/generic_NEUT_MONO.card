@@ -7,7 +7,7 @@ EVCT-DIR 0. 0. 1.
 EVCT-MPV 1
 EVCT-PV _E_MONO_
 
-EVCT-INMEV 0
+EVCT-INMEV 1
 NEUT-NUMBNDN _NEUTRONS_
 NEUT-NUMBNDP _PROTONS_
 NEUT-NUMFREP _HYDROGEN_
@@ -53,30 +53,5 @@ NEUT-MODE -1
 ##         30:    NC Diffract. pi     NC Diffract. pi
 
 ## Make CC-only, allow for neutrino and antineutrino
-## Also note, NEUT-CRS can only read 27 elements (separated by spaces), so I prefer to turn on flags one at a time
-NEUT-CRS 1=1.
-NEUT-CRS 2=1.
-NEUT-CRS 3=1.
-NEUT-CRS 4=1.
-NEUT-CRS 5=1.
-NEUT-CRS 14=1.
-NEUT-CRS 16=1.
-NEUT-CRS 19=1.
-NEUT-CRS 23=1.
-NEUT-CRS 25=1.
-NEUT-CRS 28=1.
-NEUT-CRS 29=1.
-
-NEUT-CRSB 1=1.
-NEUT-CRSB 2=1.
-NEUT-CRSB 3=1.
-NEUT-CRSB 4=1.
-NEUT-CRSB 5=1.
-NEUT-CRSB 11=1.
-NEUT-CRSB 15=1.
-NEUT-CRSB 17=1.
-NEUT-CRSB 20=1.
-NEUT-CRSB 23=1.
-NEUT-CRSB 25=1.
-NEUT-CRSB 28=1.
-NEUT-CRSB 29=1.
+NEUT-CRS 1 1 1 1 1 0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 0 1 0 1 0 0 1 1
+NEUT-CRSB 1 1 1 1 1 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1 0 0 1 0 1 0 0 1 1
