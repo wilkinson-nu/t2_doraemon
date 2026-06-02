@@ -80,7 +80,8 @@ if [ -n "${E_MONO}" ]; then
     echo "Monoenergetic mode: E=${E_MONO}"
     INCARD=generic_NEUT_MONO.card
     cp ${INPUTS_DIR}/${INCARD} .
-    sed -i "s/_E_MONO_/${E_MONO}/g" ${INCARD}
+    sed -i "s/_E_MONO_/$(awk "BEGIN{print ${E_MONO}*1000}")/g" ${INCARD}
+    
 else
     echo "Complex flux mode: ${FLUX_FILE}, ${FLUX_HIST}"
     cp ${INPUTS_DIR}/${FLUX_FILE} .
@@ -97,11 +98,11 @@ sed -i "s/_NUCLEONS_/${NUCLEONS}/g" ${INCARD}
 sed -i "s/_HYDROGEN_/${HYDROGEN}/g" ${INCARD}
 
 echo "Running NEUT..."
-shifter neutroot2 ${INCARD} ${OUTFILE} &> /dev/null
+shifter neutroot2 ${INCARD} ${OUTFILE}
 
 ## If MONO, an extra processing step is needed to get a flux histogram for nuisance
 if [ -n "${E_MONO}" ]; then
-   shifter PrepareNEUT -m ${E_MONO} -i ${OUTFILE} -o ${OUTFILE}
+   shifter PrepareNEUT -G -m ${E_MONO} -i ${OUTFILE} -o ${OUTFILE}
 fi
 
 echo "Running nuisflat..."
