@@ -36,6 +36,9 @@ echo "Moving to SCRATCH: ${TEMPDIR}"
 mkdir ${TEMPDIR}
 cd ${TEMPDIR}
 
+## Copy files to override GENIE decay defaults
+cp -r ${INPUTS_DIR}/genie_xml_override .
+
 if [ -n "${E_MONO}" ]; then
     echo "Monoenergetic mode: E=${E_MONO}"
     GEVGEN_FLUX_ARGS="-e ${E_MONO}"
@@ -53,6 +56,7 @@ cp ${INPUTS_DIR}/${TUNE}_splines.xml.gz .
 echo "Starting gevgen..."
 shifter gevgen -n ${NEVENTS} -t ${TARG} -p ${NU_PDG} \
 	--event-generator-list CC \
+	--xml-path genie_xml_override \
 	--cross-sections ${TUNE}_splines.xml.gz \
 	--tune ${TUNE} --seed ${THIS_SEED} \
 	${GEVGEN_FLUX_ARGS} -o ${OUTFILE}
