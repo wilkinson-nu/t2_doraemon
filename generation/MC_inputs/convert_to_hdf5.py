@@ -5,16 +5,18 @@ import awkward as ak
 import sys
 from glob import glob
 
+## Remove CC as uninteresting for the CC-only challenge datasets
+## Also remove pdgnu and tgt as everything is numu -- argon
 SCALAR_BRANCHES = {
     "Mode":         ("mode",    np.int32  ),
-    "PDGnu":        ("pdg_nu",  np.int32  ),
-    "tgt":          ("pdg_tgt", np.int32  ),
+    # "PDGnu":        ("pdg_nu",  np.int32  ),
+    # "tgt":          ("pdg_tgt", np.int32  ),
     "Enu_true":     ("Enu",     np.float32),
     "W":            ("W",       np.float32),
     "Q2":           ("Q2",      np.float32),
     "q0":           ("q0",      np.float32),
     "q3":           ("q3",      np.float32),
-    "cc":           ("cc",      np.bool_  ),
+    # "cc":           ("cc",      np.bool_  ),
     "nfsp":         ("nfsp",    np.int32  ),
 }
 
@@ -26,6 +28,14 @@ VLEN_BRANCHES = {
     "pdg": ("pdg", np.int32  ),
 }
 
+## PDG codes for neutral kaons that should all be relabeled to 311
+## The treatment between generators is really inconsistent, but the physics shouldn't be affected by this re-labelling
+## (Geant4 would then pick mass eigenstatest)
+NEUTRAL_KAON_PDGS = (310, 130, 311, -311)
+
+## Pick a maximum PDG value to include
+## This is just used to remove nuclear remnants, which are uninteresting here, and not consistently included between (or indeed within) generators
+PDG_MAX = int(1e8)
 
 def convert_flattrees_to_hdf5(root_files,
                               hdf5_file,
@@ -52,7 +62,24 @@ def convert_flattrees_to_hdf5(root_files,
 
             scalar_data = tree.arrays(list(SCALAR_BRANCHES.keys()), library="np")
             vlen_data   = tree.arrays(list(VLEN_BRANCHES.keys()), library="ak")
-            nfsp        = scalar_data["nfsp"]
+
+            ## Mask PDG codes we don't want to retain and apply to all particle branches
+            pdg = vlen_data["pdg"]
+            keep = np.abs(pdg) < PDG_MAX
+            for root_name in VLEN_BRANCHES:
+                vlen_data[root_name] = vlen_data[root_name][keep]
+
+            ## Relabel all neutral kaon variants to 311
+            pdg = vlen_data["pdg"]
+            kaon_mask = ak.zeros_like(pdg, dtype=bool)
+            for code in NEUTRAL_KAON_PDGS:
+                kaon_mask = kaon_mask | (pdg == code)
+            vlen_data["pdg"] = ak.where(kaon_mask, 311, pdg)
+
+            ## Recompute nfsp from the filtered structure so offsets stay valid.
+            ## The original nfsp branch cannot be trusted
+            nfsp = ak.to_numpy(ak.num(vlen_data["pdg"])).astype(np.int32)
+            scalar_data["nfsp"] = nfsp
             n_particles = int(nfsp.sum())
 
             for root_name in SCALAR_BRANCHES:
