@@ -106,8 +106,8 @@ MEC_cm_strength_pn        = 4
 
 # Enable particular hyperon channels:
 hyp_lambda      = 1      // Lambda zero baryon production
-hyp_sigma_zero  = 1      // Sigma zero baryon production
-hyp_sigma_minus = 1      // Sigma minus baryon production
+hyp_sigma_zero  = 0      // Sigma zero baryon production
+hyp_sigma_minus = 0      // Sigma minus baryon production
 
 # Axial mass for hyperons:
 hyp_axial_mass  = 1030   // Hyperon axial mass
