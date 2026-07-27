@@ -43,12 +43,10 @@ do
 	    
 	    ## Set everything important...
 	    sed -i "s/__THIS_SEED__/${RANDOM}/g" ${THIS_TEMP}
-	    sed -i "s/__FILE_NUM__/${PADJOB}/g" ${THIS_TEMP}
 	    sed -i "s/__NU_PDG__/${NU_PDG}/g" ${THIS_TEMP}
 	    sed -i "s/__OUTDIR__/${OUTDIR//\//\\/}/g" ${THIS_TEMP}
 	    sed -i "s/__OUTFILE__/${OUTFILE}/g" ${THIS_TEMP}
             sed -i "s/__TARG__/${TARG}/g" ${THIS_TEMP}
-            sed -i "s/__ROOT_NAME__/${OUTNAME_ROOT}/g" ${THIS_TEMP}
 	    sed -i "s/__E_MONO__/${E_MONO}/g" ${THIS_TEMP}
 	    echo "Submitting ${THIS_TEMP}"
 	    

@@ -46,14 +46,12 @@ do
 	    
 	    ## Set everything important...
 	    sed -i "s/__THIS_SEED__/${RANDOM}/g" ${THIS_TEMP}
-	    sed -i "s/__FILE_NUM__/${PADJOB}/g" ${THIS_TEMP}
 	    sed -i "s/__NU_PDG__/${NU_PDG}/g" ${THIS_TEMP}
 	    sed -i "s/__OUTDIR__/${OUTDIR//\//\\/}/g" ${THIS_TEMP}
 	    sed -i "s/__OUTFILE__/${OUTFILE}/g" ${THIS_TEMP}
 	    sed -i "s/__FLUX_FILE__/${FLUX_FILE}/g" ${THIS_TEMP}
 	    sed -i "s/__FLUX_HIST__/${FLUX}/g" ${THIS_TEMP}
             sed -i "s/__TARG__/${TARG}/g" ${THIS_TEMP}
-            sed -i "s/__ROOT_NAME__/${OUTNAME_ROOT}/g" ${THIS_TEMP}
 	    sed -i "s/__E_MAX__/${E_MAX}/g" ${THIS_TEMP}
             sed -i "s/__E_MIN__/${E_MIN}/g" ${THIS_TEMP}
 	    sed -i "s/__E_MONO__//g" ${THIS_TEMP}

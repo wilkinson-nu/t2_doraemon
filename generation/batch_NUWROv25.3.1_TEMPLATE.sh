@@ -11,11 +11,9 @@
 
 ## These change for each job
 THIS_SEED=__THIS_SEED__
-FILE_NUM=__FILE_NUM__
 NU_PDG=__NU_PDG__
 OUTDIR=__OUTDIR__
 TARG=__TARG__
-ROOT_NAME=__ROOT_NAME__
 OUTFILE=__OUTFILE__
 
 E_MONO=__E_MONO__

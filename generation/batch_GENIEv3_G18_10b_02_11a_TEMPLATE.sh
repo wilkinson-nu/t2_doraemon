@@ -10,11 +10,9 @@
 
 ## These change for each job
 THIS_SEED=__THIS_SEED__
-FILE_NUM=__FILE_NUM__
 NU_PDG=__NU_PDG__
 OUTDIR=__OUTDIR__
 TARG=__TARG__
-ROOT_NAME=__ROOT_NAME__
 OUTFILE=__OUTFILE__
 
 ## Flux mode: set E_MONO for monoenergetic, or FLUX_FILE+FLUX_HIST+E_MIN+E_MAX for complex flux
