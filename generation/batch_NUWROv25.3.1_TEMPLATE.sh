@@ -51,7 +51,10 @@ else
 fi
 
 if [ -n "${E_MONO}" ]; then
+
     echo "Monoenergetic mode: E=${E_MONO}"
+    echo "Multiplying by 1000 for NuWro's expected input..."
+    E_MONO=$(awk "BEGIN {print $E_MONO * 1000}")
     INCARD=generic_NUWROv25.3.1_MONO.params
     cp ${INPUTS_DIR}/${INCARD} .
     sed -i "s/_E_MONO_/${E_MONO}/g" ${INCARD}
