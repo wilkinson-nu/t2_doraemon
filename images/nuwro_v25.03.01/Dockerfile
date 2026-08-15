@@ -11,9 +11,10 @@ RUN apt-get update && apt-get upgrade -y && \
 ## Symlink Pythia6 into ROOT lib dir as NuWro expects
 RUN ln -s ${GEN_DIR}/pythia6/libPythia6.so ${ROOTSYS}/lib/libPythia6.so
 
-## Get NuWro
+## Get NuWro (using a slightly hacked version that modifies which particles PYTHIA decays and
+## allows the hyperon cascade code to be avoided)
 WORKDIR ${GEN_DIR}
-RUN git clone --depth 1 --branch remove-vla https://github.com/wilkinson-nu/nuwro nuwro && \
+RUN git clone --depth 1 --branch decays-on-25_03_1 https://github.com/wilkinson-nu/nuwro nuwro && \
     cd nuwro && make -j${NCORES}
 
 ENV NUWRO=${GEN_DIR}/nuwro
