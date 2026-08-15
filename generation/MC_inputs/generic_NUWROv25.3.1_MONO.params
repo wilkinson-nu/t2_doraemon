@@ -25,6 +25,7 @@ dyn_coh_cc =1      // Coherent charged current
 dyn_coh_nc =0      // Coherent neutral current
 dyn_mec_cc =1      // Meson exchange charged current
 dyn_mec_nc =0      // Meson exchange neutral current
+dyn_lep =0
 
 ## QEL
 qel_vector_ff_set = 2 // BBBA05, hep-ex/0602017 BBBA05 for Q2<18 GeV	
@@ -150,3 +151,18 @@ first_step = 1       // use (1) or not (0) formation zone for primary particles
 
 formation_zone = fz-new
 pauli_blocking   = 1 // enable (1) or not (0) Pauli blocking
+
+# Non-standard particle decay handling
+decay_pi_zero = 0
+decay_eta = 1
+decay_lambda_zero = 0
+decay_sigma_zero = 1
+decay_sigma_plus = 1
+decay_sigma_minus = 1
+decay_k_plus = 0
+decay_k_zero = 0
+decay_k_zero_bar = 0
+decay_k_minus = 0
+
+# Turn off FSI for hyperons
+kaskada_hyperon_on=0
