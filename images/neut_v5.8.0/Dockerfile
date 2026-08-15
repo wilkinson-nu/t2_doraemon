@@ -11,12 +11,16 @@ RUN apt-get update && apt-get upgrade -y && \
 ## Copy in the NEUT tarball
 COPY neut-5.8.0.zip ${GEN_DIR}/neut-5.8.0.zip
 
+## Also copy in the patch file to modify the PYTHIA decays
+COPY nejet.patch  ${GEN_DIR}/nejet.patch
+
 ## Unpack and build NEUT
 WORKDIR ${GEN_DIR}
 RUN unzip neut-5.8.0.zip && \
     mv neut-5.8.0 neut && \
     rm neut-5.8.0.zip && \
     cd neut && \
+    patch -p1 --batch --forward --input=${GEN_DIR}/nejet.patch && \
     cd src && autoreconf -i --force && cd .. && \
     mkdir build && cd build && \
     ../src/configure --prefix=$(readlink -f Linux) --enable-builtin-cernlib && \

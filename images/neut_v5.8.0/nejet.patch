@@ -1,0 +1,17 @@
+--- a/src/neutcore/nejet.F
++++ b/src/neutcore/nejet.F
+@@ -126,12 +126,13 @@
+       PARP(2)     = 0.001
+ *     Switch to be allowed to decay or not  --->  ludat3.h
+       MDCY(LUCOMP(111),1) = 0
+-      MDCY(LUCOMP(221),1) = 0
++      MDCY(LUCOMP(221),1) = 1
+       MDCY(LUCOMP(311),1) = 0
+       MDCY(LUCOMP(223),1) = 0
+       MDCY(LUCOMP(130),1) = 0
+       MDCY(LUCOMP(310),1) = 0
+       MDCY(LUCOMP(331),1) = 1
++      MDCY(LUCOMP(3122),1) = 0
+ **** without tau decay(decay at tauola)
+       IF(ITAUFLGCORE.eq.1) THEN
+          MDCY(LUCOMP(15),1) = 0
