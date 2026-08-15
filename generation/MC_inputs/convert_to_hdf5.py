@@ -4,11 +4,13 @@ import numpy as np
 import awkward as ak
 import sys
 from glob import glob
+import operator
+from functools import reduce
 
 ## Remove CC as uninteresting for the CC-only challenge datasets
 ## Also remove pdgnu and tgt as everything is numu -- argon
 SCALAR_BRANCHES = {
-    "Mode":         ("mode",    np.int32  ),
+    # "Mode":         ("mode",    np.int32  ),
     # "PDGnu":        ("pdg_nu",  np.int32  ),
     # "tgt":          ("pdg_tgt", np.int32  ),
     "Enu_true":     ("Enu",     np.float32),
@@ -36,6 +38,10 @@ NEUTRAL_KAON_PDGS = (310, 130, 311, -311)
 ## Pick a maximum PDG value to include
 ## This is just used to remove nuclear remnants, which are uninteresting here, and not consistently included between (or indeed within) generators
 PDG_MAX = int(1e8)
+
+## Also veto any PDG code in the following list
+## For now this is just to remove any outgoing neutrinos as uninteresting
+PDG_VETO = (12, -12, 14, -14, 16, -16)
 
 def convert_flattrees_to_hdf5(root_files,
                               hdf5_file,
@@ -65,7 +71,8 @@ def convert_flattrees_to_hdf5(root_files,
 
             ## Mask PDG codes we don't want to retain and apply to all particle branches
             pdg = vlen_data["pdg"]
-            keep = np.abs(pdg) < PDG_MAX
+            veto = reduce(operator.or_, (pdg == v for v in PDG_VETO), ak.zeros_like(pdg, dtype=bool))
+            keep = (np.abs(pdg) < PDG_MAX) & ~veto
             for root_name in VLEN_BRANCHES:
                 vlen_data[root_name] = vlen_data[root_name][keep]
 
