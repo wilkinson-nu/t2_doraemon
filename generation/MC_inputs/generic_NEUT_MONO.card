@@ -53,5 +53,6 @@ NEUT-MODE -1
 ##         30:    NC Diffract. pi     NC Diffract. pi
 
 ## Make CC-only, allow for neutrino and antineutrino
-NEUT-CRS 1 1 1 1 1 0 0 0 0 0 0 0 0 1 0 1 0 0 1 0 0 0 1 0 1 0 0 1 1
-NEUT-CRSB 1 1 1 1 1 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1 0 0 1 0 1 0 0 1 1
+NEUT-CRS  1 1 1 1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0 1 0 0 1 1
+NEUT-CRSB 1 1 1 1 1 0 0 0 0 0 1 0 0 0 1 0 0 0 0 1 0 0 1 0 1 0 0 1 1
+
