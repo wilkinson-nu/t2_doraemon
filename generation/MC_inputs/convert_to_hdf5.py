@@ -115,17 +115,24 @@ def convert_flattrees_to_hdf5(root_files,
     n_particles = int(nfsp.sum())
     print(f"Total: {n_events} events, {n_particles} particles")
 
-    # --- Truncate ---
-    if max_events is not None:
-        if n_events < max_events:
-            raise ValueError(f"Only {n_events} events available, cannot truncate to {max_events}")
-        scalar_data = {k: v[:max_events] for k, v in scalar_data.items()}
-        vlen_data   = {k: v[:max_events] for k, v in vlen_data.items()}
-        nfsp        = scalar_data["nfsp"]
-        n_events    = len(nfsp)
-        n_particles = int(nfsp.sum())
-        print(f"Truncated to {n_events} events, {n_particles} particles")
+    # --- Drop empty events, then truncate ---
+    keep_idx = np.flatnonzero(nfsp > 0)
+    n_empty = n_events - len(keep_idx)
+    if n_empty:
+        print(f"Dropping {n_empty} empty events")
     
+    if max_events is not None:
+        if len(keep_idx) < max_events:
+            raise ValueError(f"Only {len(keep_idx)} non-empty events available, cannot truncate to {max_events}")
+        keep_idx = keep_idx[:max_events]
+
+    scalar_data = {k: v[keep_idx] for k, v in scalar_data.items()}
+    vlen_data   = {k: v[keep_idx] for k, v in vlen_data.items()}
+    nfsp        = scalar_data["nfsp"]
+    n_events    = len(nfsp)
+    n_particles = int(nfsp.sum())
+    print(f"Kept {n_events} events, {n_particles} particles")
+
     # --- Write ---
     with h5py.File(hdf5_file, "w") as hf:
 
