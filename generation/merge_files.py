@@ -152,7 +152,7 @@ if __name__ == "__main__":
     
     ## Merge into a temporary location first, then move into processed_dir
     merged_tmp = args.output_dir / (args.output_name + ".tmp")
-    merge_hdf5(files_to_merge, merged_tmp, max_events)
+    merge_hdf5(files_to_merge, merged_tmp)
 
     ## Copy to the final destination
     merged_dest = args.output_dir / args.output_name
