@@ -84,7 +84,7 @@ shifter nuisflat -f GenericVectors -i NuWro:${OUTFILE} -o ${OUTFILE/.root/_NUISF
 
 echo "Converting to hdf5..."
 cp ${INPUTS_DIR}/convert_to_hdf5.py .
-shifter python convert_to_hdf5.py ${OUTFILE/.root/_NUISFLAT.root} ${OUTFILE/.root/_NUISFLAT.h5}
+shifter python convert_to_hdf5.py --root_files=${OUTFILE/.root/_NUISFLAT.root} --hdf5_file=${OUTFILE/.root/_NUISFLAT.h5}
 echo "Complete"
 
 ## Copy back the important files
