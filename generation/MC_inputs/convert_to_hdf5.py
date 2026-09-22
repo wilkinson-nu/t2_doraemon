@@ -6,7 +6,8 @@ import sys
 from glob import glob
 import operator
 from functools import reduce
-
+import argparse
+    
 ## Remove CC as uninteresting for the CC-only challenge datasets
 ## Also remove pdgnu and tgt as everything is numu -- argon
 SCALAR_BRANCHES = {
@@ -32,7 +33,7 @@ VLEN_BRANCHES = {
 
 ## PDG codes for neutral kaons that should all be relabeled to 311
 ## The treatment between generators is really inconsistent, but the physics shouldn't be affected by this re-labelling
-## (Geant4 would then pick mass eigenstatest)
+## (Geant4 would then pick mass eigenstates)
 NEUTRAL_KAON_PDGS = (310, 130, 311, -311)
 
 ## Pick a maximum PDG value to include
@@ -45,7 +46,8 @@ PDG_VETO = (12, -12, 14, -14, 16, -16)
 
 def convert_flattrees_to_hdf5(root_files,
                               hdf5_file,
-                              tree_name="FlatTree_VARS"):
+                              tree_name="FlatTree_VARS",
+                              max_events=None):
     if isinstance(root_files, str):
         root_files = [root_files]
     root_files = [f for pattern in root_files for f in sorted(glob(pattern))]
@@ -113,6 +115,17 @@ def convert_flattrees_to_hdf5(root_files,
     n_particles = int(nfsp.sum())
     print(f"Total: {n_events} events, {n_particles} particles")
 
+    # --- Truncate ---
+    if max_events is not None:
+        if n_events < max_events:
+            raise ValueError(f"Only {n_events} events available, cannot truncate to {max_events}")
+        scalar_data = {k: v[:max_events] for k, v in scalar_data.items()}
+        vlen_data   = {k: v[:max_events] for k, v in vlen_data.items()}
+        nfsp        = scalar_data["nfsp"]
+        n_events    = len(nfsp)
+        n_particles = int(nfsp.sum())
+        print(f"Truncated to {n_events} events, {n_particles} particles")
+    
     # --- Write ---
     with h5py.File(hdf5_file, "w") as hf:
 
@@ -161,5 +174,13 @@ def convert_flattrees_to_hdf5(root_files,
 
 
 if __name__ == "__main__":
-    convert_flattrees_to_hdf5(sys.argv[1:-1], sys.argv[-1])    
 
+    parser = argparse.ArgumentParser(description="Convert FlatTree ROOT files to HDF5.")
+    parser.add_argument("--root_files", type=str, required=True)
+    parser.add_argument("--hdf5_file", type=str, required=True)
+    parser.add_argument("--max_events", type=int, default=None)
+    args = parser.parse_args()
+
+    convert_flattrees_to_hdf5(args.root_files,
+                              args.hdf5_file,
+                              max_events=args.max_events)
