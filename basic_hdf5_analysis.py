@@ -426,26 +426,36 @@ def plot_cooccurrence(hdf5_file, codes, title=None,
     plt.close(fig)    
     
 
-def make_plots(file_prefix):
+def make_plots(file_path, file_prefix):
     
     input_files = [
-        "output/"+file_prefix+"_GENIEv3_G18_10a_02_11a_10M.h5",
-        "output/"+file_prefix+"_GENIEv3_G18_10b_02_11a_10M.h5",
-        "output/"+file_prefix+"_NUWROv25.3.1_10M.h5",
-        "output/"+file_prefix+"_NEUT580_10M.h5",
+        file_path+"/"+file_prefix+"_GENIEv3_G18_10a_02_11a_10M.h5",
+        file_path+"/"+file_prefix+"_GENIEv3_G18_10b_02_11a_10M.h5",
+        file_path+"/"+file_prefix+"_GENIEv3_AR23_20i_00_000_10M.h5",
+        file_path+"/"+file_prefix+"_GENIEv3_G21_11a_00_000_10M.h5",        
+        file_path+"/"+file_prefix+"_NUWROv25.3.1_10M.h5",
+        file_path+"/"+file_prefix+"_NEUT580_10M.h5",
+        file_path+"/"+file_prefix+"_NEUTDCC_10M.h5",        
     ]
     
     generator_names = ["GENIE 10a",
                        "GENIE 10b",
+                       "GENIE AR23",
+                       "GENIE SuSAv2",
                        "NuWro 25",
-                       "NEUT 580"]
+                       "NEUT 580",
+                       "NEUT DCC",
+                       ]
 
     # Define your own colors with RGB (0-255) values
     colors = [
         rgb(  0, 119, 187),   # blue
         rgb( 51, 187, 238),   # cyan
+        rgb(238, 119,  51),   # orange
+        rdg(204,  51,  17),   # red
         rgb(  0, 153, 136),   # teal
         rgb(238,  51, 119),   # magenta
+        rgb(187, 187, 187),   # grey
     ]
     
     all_pdgs = plot_pdg_frequencies(input_files, generator_names, colors=colors, normalize=False, prefix="plots/"+file_prefix)
@@ -480,9 +490,10 @@ def make_plots(file_prefix):
 
 if __name__ == "__main__":
 
-    make_plots("DUNE_FHC_numu_Ar40_osc")
-    make_plots("DUNE_FHC_numu_Ar40_unosc")
-    make_plots("MONO_numu_Ar40_0.6GeV")
-    make_plots("MONO_numu_Ar40_2.5GeV")
-    make_plots("MONO_numu_Ar40_10GeV")
+    file_path="output"
+    make_plots(file_path, "DUNE_FHC_numu_Ar40_osc")
+    make_plots(file_path, "DUNE_FHC_numu_Ar40_unosc")
+    make_plots(file_path, "MONO_numu_Ar40_0.6GeV")
+    make_plots(file_path, "MONO_numu_Ar40_2.5GeV")
+    make_plots(file_path, "MONO_numu_Ar40_10GeV")
     
