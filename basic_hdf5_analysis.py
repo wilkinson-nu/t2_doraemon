@@ -30,6 +30,17 @@ XLABELS = {
     "pzoverE": r"$p_{z}/E$",
 }
 
+EVENT_VARS = ["Enu", "W", "Q2", "q0", "q3", "nfsp"]
+
+XLABELS.update({
+    "Enu":  r"$E_{\nu}$ (GeV)",
+    "W":    r"$W$ (GeV)",
+    "Q2":   r"$Q^{2}$ (GeV$^{2}$)",
+    "q0":   r"$q_{0}$ (GeV)",
+    "q3":   r"$|\vec{q}|$ (GeV)",
+    "nfsp": "N. final-state particles",
+})
+
 MULT_DICT = {
     -3122: 3,
     -2212: 3,
@@ -54,6 +65,98 @@ expected_pdgs = [-3122, -2212, -2112, -321, -211, -13, -11, 11, 13, 22, 111, 211
 
 def rgb(r, g, b):
     return (r / 255.0, g / 255.0, b / 255.0)
+
+def load_events(hdf5_file, var):
+    with h5py.File(hdf5_file, "r") as f:
+        return f["events"][var][:]
+
+
+def plot_event_var(files, var_name, labels, colors, nbins=50,
+                   x_max=None, prefix="all", logy=False):
+
+    data = [load_events(f, var_name) for f in files]
+    is_int = np.issubdtype(data[0].dtype, np.integer)
+
+    if x_max is None:
+        x_max = max(np.percentile(d[np.isfinite(d)], 99.9) for d in data) * 1.05
+
+    if is_int:
+        x_max = int(np.ceil(x_max))
+        edges = np.arange(0, x_max + 2) - 0.5
+    else:
+        edges = np.linspace(0, x_max, nbins + 1)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    for d, label, color in zip(data, labels, colors):
+        nevt = d.size
+        sel = np.clip(d[np.isfinite(d)], None, x_max)   # overflow into last bin
+        ax.hist(sel, bins=edges, histtype="step", linewidth=1.5,
+                weights=np.full(sel.size, 1.0 / nevt),
+                label=label, color=color)
+
+    ax.set_xlim(edges[0], edges[-1])
+    ax.set_xlabel(XLABELS[var_name])
+    ax.set_ylabel("Fraction of events")
+
+    log_string = "liny"
+    if logy:
+        ax.set_yscale("log")
+        log_string = "logy"
+
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(f"{prefix}_{var_name}_{log_string}.pdf")
+    plt.close(fig)
+
+    
+def check_event_vars(hdf5_file, max_print=10):
+    """Flag any event where a summary variable is <= 0 or NaN."""
+    print(f"\n=== Event variable checks: {hdf5_file} ===")
+    ok = True
+    with h5py.File(hdf5_file, "r") as f:
+        for var in EVENT_VARS:
+            d = f["events"][var][:]
+            bad = np.flatnonzero(~(d > 0))
+            if bad.size:
+                ok = False
+                print(f"  {var}: {bad.size} events not > 0 "
+                      f"(min = {np.nanmin(d)}), events {bad[:max_print].tolist()}"
+                      + (" ..." if bad.size > max_print else ""))
+    if ok:
+        print("  all event variables > 0")
+    return ok    
+
+def check_finite(hdf5_file, max_print=10):
+    """Report NaN/inf in any floating-point dataset in the file."""
+    print(f"\n=== Finite checks: {hdf5_file} ===")
+    problems = []
+
+    with h5py.File(hdf5_file, "r") as f:
+        offsets = np.asarray(f["particles"]["offsets"][:], dtype=np.int64)
+
+        def visit(name, obj):
+            if not isinstance(obj, h5py.Dataset) or obj.dtype.kind not in "fc":
+                return
+            d = obj[:]
+            bad = np.flatnonzero(~np.isfinite(d))
+            if bad.size == 0:
+                return
+            problems.append(name)
+            n_nan = np.count_nonzero(np.isnan(d[bad]))
+            if name.startswith("particles/"):
+                where = np.unique(np.searchsorted(offsets, bad, side="right") - 1)
+                tag = "events"
+            else:
+                where, tag = bad, "indices"
+            print(f"  {name}: {n_nan} NaN, {bad.size - n_nan} inf, "
+                  f"{tag} {where[:max_print].tolist()}"
+                  + (" ..." if where.size > max_print else ""))
+
+        f.visititems(visit)
+
+    if not problems:
+        print("  no NaN/inf in any float dataset")
+    return not problems
 
 
 def make_bins(min, max, nbins, log_binning=False):
@@ -432,39 +535,55 @@ def make_plots(file_path, file_prefix):
         file_path+"/"+file_prefix+"_GENIEv3_G18_10a_02_11a_10M.h5",
         file_path+"/"+file_prefix+"_GENIEv3_G18_10b_02_11a_10M.h5",
         file_path+"/"+file_prefix+"_GENIEv3_AR23_20i_00_000_10M.h5",
-        file_path+"/"+file_prefix+"_GENIEv3_G21_11a_00_000_10M.h5",        
+        file_path+"/"+file_prefix+"_GENIEv3_G21_11a_00_000_10M.h5",
+        file_path+"/"+file_prefix+"_GENIEv3_G18_10a_03_330_10M.h5",        
         file_path+"/"+file_prefix+"_NUWROv25.3.1_10M.h5",
         file_path+"/"+file_prefix+"_NEUT580_10M.h5",
         file_path+"/"+file_prefix+"_NEUTDCC_10M.h5",        
     ]
     
-    generator_names = ["GENIE 10a",
-                       "GENIE 10b",
-                       "GENIE AR23",
-                       "GENIE SuSAv2",
-                       "NuWro 25",
-                       "NEUT 580",
-                       "NEUT DCC",
-                       ]
-
-    # Define your own colors with RGB (0-255) values
+    generator_names = [
+        "GENIE 10a",
+        "GENIE 10b",
+        "GENIE AR23",
+        "GENIE SuSAv2",
+        "GENIE 330",
+        "NuWro 25",
+        "NEUT 580",
+        "NEUT DCC",
+    ]
+    
     colors = [
-        rgb(  0, 119, 187),   # blue
-        rgb( 51, 187, 238),   # cyan
-        rgb(238, 119,  51),   # orange
-        rdg(204,  51,  17),   # red
-        rgb(  0, 153, 136),   # teal
-        rgb(238,  51, 119),   # magenta
-        rgb(187, 187, 187),   # grey
+        rgb( 51,  34, 136),
+        rgb(136, 204, 238),
+        rgb( 68, 170, 153),
+        rdg( 17, 119,  51),
+        rgb(153, 153,  51),
+        rgb(221, 204, 119),
+        rgb(204, 102, 119),
+        rgb(136,  34,  85),
+        rgb(170,  68, 153),
+        rgb(221, 221, 221),
     ]
     
     all_pdgs = plot_pdg_frequencies(input_files, generator_names, colors=colors, normalize=False, prefix="plots/"+file_prefix)
 
     for file_name, generator_name in zip(input_files, generator_names):
+
         ## Check for any odd PDGs
         find_unexpected(file_name, expected_pdgs)
+
+        ## Check no issues
+        check_finite(file_name)
+        check_event_vars(file_name)
+        
         plot_cooccurrence(file_name, all_pdgs, title=generator_name,
                           prefix="plots/"+file_prefix+"_"+generator_name.replace(" ", ""), annotate=True, cmap="viridis")
+
+    for var in EVENT_VARS:
+        for logy in (False, True):
+            plot_event_var(input_files, var, generator_names, colors,
+                           prefix="plots/"+file_prefix, logy=logy)
     
     ## Now loop over all pdgs, and make per pdg plots
     for pdg in all_pdgs:
@@ -493,6 +612,9 @@ if __name__ == "__main__":
     file_path="output"
     make_plots(file_path, "DUNE_FHC_numu_Ar40_osc")
     make_plots(file_path, "DUNE_FHC_numu_Ar40_unosc")
+    make_plots(file_path, "HyperK_FHC_numu_O16_osc")
+    make_plots(file_path, "HyperK_FHC_numu_O16_unosc")
+    make_plots(file_path, "IceCube_FHC_numu_O16_numu")    
     make_plots(file_path, "MONO_numu_Ar40_0.6GeV")
     make_plots(file_path, "MONO_numu_Ar40_2.5GeV")
     make_plots(file_path, "MONO_numu_Ar40_10GeV")
