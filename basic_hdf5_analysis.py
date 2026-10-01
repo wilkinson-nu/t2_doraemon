@@ -452,7 +452,7 @@ def make_plots(file_path, file_prefix):
         rgb(  0, 119, 187),   # blue
         rgb( 51, 187, 238),   # cyan
         rgb(238, 119,  51),   # orange
-        rdg(204,  51,  17),   # red
+        rgb(204,  51,  17),   # red
         rgb(  0, 153, 136),   # teal
         rgb(238,  51, 119),   # magenta
         rgb(187, 187, 187),   # grey
@@ -490,7 +490,7 @@ def make_plots(file_path, file_prefix):
 
 if __name__ == "__main__":
 
-    file_path="output"
+    file_path="/global/cfs/cdirs/dune/users/cwilk/t2_doraemon"
     make_plots(file_path, "DUNE_FHC_numu_Ar40_osc")
     make_plots(file_path, "DUNE_FHC_numu_Ar40_unosc")
     make_plots(file_path, "MONO_numu_Ar40_0.6GeV")
