@@ -609,7 +609,7 @@ def make_plots(file_path, file_prefix):
 
 if __name__ == "__main__":
 
-    file_path="output"
+    file_path="/global/cfs/cdirs/dune/users/cwilk/t2_doraemon"
     make_plots(file_path, "DUNE_FHC_numu_Ar40_osc")
     make_plots(file_path, "DUNE_FHC_numu_Ar40_unosc")
     make_plots(file_path, "HyperK_FHC_numu_O16_osc")
