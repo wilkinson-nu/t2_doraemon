@@ -24,7 +24,7 @@ FLUX_HIST=__FLUX_HIST__
 
 ## These are fixed
 TUNE=G18_10a_02_11a
-NEVENTS=1000000
+NEVENTS=1010000
 INPUTS_DIR=${PWD}/MC_inputs
 
 ## Where to temporarily save files
@@ -67,7 +67,7 @@ shifter nuisflat -f GenericVectors -i GENIE:${OUTFILE/.root/_NUIS.root} -o ${OUT
 
 echo "Converting to hdf5..."
 cp ${INPUTS_DIR}/convert_to_hdf5.py .
-shifter python convert_to_hdf5.py --root_files=${OUTFILE/.root/_NUISFLAT.root} --hdf5_file=${OUTFILE/.root/_NUISFLAT.h5}
+shifter python convert_to_hdf5.py --root_files=${OUTFILE/.root/_NUISFLAT.root} --hdf5_file=${OUTFILE/.root/_NUISFLAT.h5} --max_events=1000000
 echo "Complete"
 
 ## Copy back the important files
