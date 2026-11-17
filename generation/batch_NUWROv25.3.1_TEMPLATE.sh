@@ -41,6 +41,8 @@ elif [[ $TARG == "1000060120[0.85714],1000010010[0.14286]" ]]; then
     SHORT_TARG="CH2"
 elif [[ $TARG == "1000060120[1.00]" ]]; then
     SHORT_TARG="C"
+elif [[ $TARG == "1000080160[1.00]" ]]; then
+    SHORT_TARG="O"
 elif [[ $TARG == "1000010010[1.00]" ]]; then
     SHORT_TARG="proton"
 elif [[ $TARG == "1000000010[1.00]" ]];	then
