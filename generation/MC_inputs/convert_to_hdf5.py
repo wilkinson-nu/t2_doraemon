@@ -7,6 +7,7 @@ from glob import glob
 import operator
 from functools import reduce
 import argparse
+from collections import Counter
     
 ## Remove CC as uninteresting for the CC-only challenge datasets
 ## Also remove pdgnu and tgt as everything is numu -- argon
@@ -44,6 +45,10 @@ PDG_MAX = int(1e8)
 ## For now this is just to remove any outgoing neutrinos as uninteresting
 PDG_VETO = (12, -12, 14, -14, 16, -16)
 
+## Veto events which have PDGs outside this list at the final stage
+ALLOWED_PDGS = (-3122, -2212, -2112, -321, -211, -13, -11, 11, 13, 22, 111, 211, 311, 321, 2112, 2212, 3122)
+
+
 def convert_flattrees_to_hdf5(root_files,
                               hdf5_file,
                               tree_name="FlatTree_VARS",
@@ -59,6 +64,9 @@ def convert_flattrees_to_hdf5(root_files,
     # --- First pass: read all data ---
     all_scalar_data = {root_name: [] for root_name in SCALAR_BRANCHES}
     all_vlen_data   = {root_name: [] for root_name in VLEN_BRANCHES}
+    all_event_ok    = []
+    bad_pdg_particles = Counter()
+    bad_pdg_events    = Counter()
     file_metadata   = []
     event_cursor    = 0
     particle_cursor = 0
@@ -85,6 +93,18 @@ def convert_flattrees_to_hdf5(root_files,
                 kaon_mask = kaon_mask | (pdg == code)
             vlen_data["pdg"] = ak.where(kaon_mask, 311, pdg)
 
+            ## Flag events where every particle has an allowed PDG (whole event is dropped later otherwise)
+            pdg = vlen_data["pdg"]
+            allowed = reduce(operator.or_, (pdg == a for a in ALLOWED_PDGS), ak.zeros_like(pdg, dtype=bool))
+            all_event_ok.append(ak.to_numpy(ak.all(allowed, axis=1)))
+
+            ## Tally disallowed PDGs (particle counts and number of events containing each)
+            bad = pdg[~allowed]
+            codes, counts = np.unique(ak.to_numpy(ak.flatten(bad)), return_counts=True)
+            for code, n in zip(codes, counts):
+                bad_pdg_particles[int(code)] += int(n)
+                bad_pdg_events[int(code)]    += int(ak.sum(ak.any(bad == code, axis=1)))
+            
             ## Recompute nfsp from the filtered structure so offsets stay valid.
             ## The original nfsp branch cannot be trusted
             nfsp = ak.to_numpy(ak.num(vlen_data["pdg"])).astype(np.int32)
@@ -115,12 +135,19 @@ def convert_flattrees_to_hdf5(root_files,
     n_particles = int(nfsp.sum())
     print(f"Total: {n_events} events, {n_particles} particles")
 
-    # --- Drop empty events, then truncate ---
-    keep_idx = np.flatnonzero(nfsp > 0)
-    n_empty = n_events - len(keep_idx)
+    # --- Drop empty events and events with disallowed PDGs, then truncate ---
+    event_ok = np.concatenate(all_event_ok)
+    non_empty = nfsp > 0
+    keep_idx = np.flatnonzero(non_empty & event_ok)
+    n_empty = int((~non_empty).sum())
+    n_bad_pdg = int((non_empty & ~event_ok).sum())
     if n_empty:
         print(f"Dropping {n_empty} empty events")
-    
+    if n_bad_pdg:
+        print(f"Dropping {n_bad_pdg} events containing PDGs not in ALLOWED_PDGS")
+        for code, n_ev in bad_pdg_events.most_common():
+            print(f"    PDG {code:>10}: {n_ev} events, {bad_pdg_particles[code]} particles")
+            
     if max_events is not None:
         if len(keep_idx) < max_events:
             raise ValueError(f"Only {len(keep_idx)} non-empty events available, cannot truncate to {max_events}")
